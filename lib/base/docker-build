@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+
+(
+    set -e
+    cd $LDLK_WORKDIR/$LDLK_INSTANCE/docker
+    INFO "Buidling docker ($(pwd)/../docker.log)"
+    set -x
+    # TODO: support dynbinary
+    DOCKER_EXPERIMENTAL=1 DOCKER_INCREMENTAL_BINARY=1 make binary 2>&1 > ../docker.log
+    set +x
+   
+    INFO "Copying docker to $LDLK_WORKDIR/$LDLK_INSTANCE/docker-output"
+    set -x
+    mkdir -p $LDLK_WORKDIR/$LDLK_INSTANCE/docker-output/usr/bin
+    mkdir -p $LDLK_WORKDIR/$LDLK_INSTANCE/docker-output/lib/systemd/system
+    # TODO: eliminate sudo
+    sudo -E PATH=$PATH DOCKER_MAKE_INSTALL_PREFIX=$LDLK_WORKDIR/$LDLK_INSTANCE/docker-output/usr make install
+    cp contrib/init/systemd/docker.{service,socket} $LDLK_WORKDIR/$LDLK_INSTANCE/docker-output/lib/systemd/system
+    set +x
+)

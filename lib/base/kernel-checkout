@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+ENSURE LDLK_KERNEL_GIT
+ENSURE LDLK_KERNEL_VERSION
+
+(
+    cd $LDLK_WORKDIR/$LDLK_INSTANCE
+    if [ -d linux ]; then
+	INFO "Skiiping cloning linux (already exists: $(pwd)/linux)"
+    else
+	INFO "Cloning from $LDLK_KERNEL_GIT to $(pwd)/linux"
+	git clone $LDLK_KERNEL_GIT linux
+    fi
+    cd linux
+    INFO "Checking out $LDLK_KERNEL_VERSION ($(pwd)/linux)"
+    git checkout $LDLK_KERNEL_VERSION
+)

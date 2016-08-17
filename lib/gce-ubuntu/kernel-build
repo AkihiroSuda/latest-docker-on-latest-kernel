@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+
+(
+    cd $LDLK_WORKDIR/$LDLK_INSTANCE/linux
+    INFO "TODO: Buidling kernel ($(pwd))/../linux.log"
+)

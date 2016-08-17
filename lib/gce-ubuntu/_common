@@ -1,0 +1,4 @@
+source ../base/_common
+
+GCLOUD=gcloud
+UZER=docker-user

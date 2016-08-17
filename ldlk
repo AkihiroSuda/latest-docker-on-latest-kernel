@@ -1,0 +1,73 @@
+#!/bin/bash
+
+LDLK_INSTANCE=
+LDLK_WORKDIR=/tmp/ldlk
+LDLK_KERNEL_GIT=git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+LDLK_KERNEL_VERSION=master
+LDLK_DOCKER_GIT=https://github.com/docker/docker.git
+LDLK_DOCKER_VERSION=master
+LDLK_GCE_MACHINE_IMAGE=https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20160815
+LDLK_GCE_MACHINE_TYPE=n1-standard-1
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+driver=gce-ubuntu
+
+usage() {
+    echo "Usage: $0 [OPTIONS] INSTANCE"
+    echo "  Latest Docker on Latest Linux Kernel"
+    echo
+    echo "Options:"
+    echo
+    echo "  -h, --help"
+    echo "  --kernel-version VERSION (default $LDLK_KERNEL_VERSION)"
+    echo "  --docker-version VERSION (default $LDLK_DOCKER_VERSION)"
+    echo
+    exit 1
+}
+
+while [[ $# -gt 1 ]]; do
+    key="$1"
+    case $key in
+	-h|--help)
+	    usage
+	    exit 1
+	    ;;
+	--kernel-version)
+	    LDLK_KERNEL_VERSION="$2"
+	    shift
+	    ;;	
+	--docker-version)
+	    LDLK_DOCKER_VERSION="$2"
+	    shift
+	    ;;
+	*)
+	    usage
+	    exit 1
+	    ;;
+    esac
+    shift
+done
+LDLK_INSTANCE=$1
+
+if [ -z $LDLK_INSTANCE ]; then
+   usage
+   exit 1
+fi   
+
+(
+    set -e
+    cd $script_dir/lib/$driver
+    export LDLK_INSTANCE LDLK_WORKDIR
+    export LDLK_KERNEL_GIT LDLK_KERNEL_VERSION
+    export LDLK_DOCKER_GIT LDLK_DOCKER_VERSION
+    export LDLK_GCE_MACHINE_IMAGE LDLK_GCE_MACHINE_TYPE
+    ./init
+    ./create
+    ./kernel-checkout
+    ./docker-checkout
+    ./kernel-build
+    ./docker-build
+    ./kernel-install
+    ./docker-install
+    ./reboot
+)

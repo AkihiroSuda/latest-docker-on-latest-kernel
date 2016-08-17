@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_INSTANCE
+
+INFO "Restarting $LDLK_INSTANCE"
+$GCLOUD compute instances stop $LDLK_INSTANCE
+$GCLOUD compute instances start $LDLK_INSTANCE
+INFO "Done"
+

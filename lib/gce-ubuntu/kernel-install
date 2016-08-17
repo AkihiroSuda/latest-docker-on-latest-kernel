@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+
+INFO "TODO: Installing Linux to $LDLK_INSTANCE"

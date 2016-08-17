@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+
+INFO "Installing docker to $LDLK_INSTANCE"
+set -x
+$GCLOUD compute copy-files $LDLK_WORKDIR/$LDLK_INSTANCE/docker-output $UZER@$LDLK_INSTANCE:/tmp
+# TODO: we should not overwrite systemd config, probably
+$GCLOUD compute ssh $UZER@$LDLK_INSTANCE -- 'sudo systemctl stop docker; sudo cp -r /tmp/docker-output/* / && sudo systemctl daemon-reload && sudo systemctl start docker'
+# TODO: set up permission for $UZER
+
+set +x

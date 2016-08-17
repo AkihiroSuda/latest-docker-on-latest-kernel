@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+ENSURE LDLK_DOCKER_GIT
+ENSURE LDLK_DOCKER_VERSION
+
+(
+    cd $LDLK_WORKDIR/$LDLK_INSTANCE
+    if [ -d docker ]; then
+	INFO "Skiiping cloning docker (already exists: $(pwd)/docker)"
+    else
+	INFO "Cloning from $LDLK_DOCKER_GIT to $(pwd)/docker"
+	git clone $LDLK_DOCKER_GIT docker
+    fi
+    cd docker
+    INFO "Checking out $LDLK_DOCKER_VERSION ($(pwd)/docker)"
+    git checkout $LDLK_DOCKER_VERSION
+)
