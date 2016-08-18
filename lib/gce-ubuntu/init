@@ -5,7 +5,7 @@ source _common
 ENSURE LDLK_WORKDIR
 ENSURE LDLK_INSTANCE
 
-../base/init
+../_base/init
 
 EXISTS $GCLOUD || \
     (ERROR "gcloud is not installed. Please install from https://cloud.google.com/sdk/downloads"; false)
@@ -18,5 +18,3 @@ test ! -z $($GCLOUD -q config list --format 'value(compute.region)') || \
     (ERROR "compute.region not set. Please try: gcloud config set compute/region REGION (e.g.asia-east1)."; false)
 test ! -z $($GCLOUD -q config list --format 'value(compute.zone)') || \
     (ERROR "compute.zone not set. Please try: gcloud config set compute/zone ZONE (e.g.asia-east1-c)."; false)
-
-$GCLOUD compute ssh $UZER@$LDLK_INSTANCE -- sudo groupadd -f docker

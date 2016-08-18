@@ -6,7 +6,25 @@ ENSURE LDLK_INSTANCE
 ENSURE LDLK_GCE_MACHINE_IMAGE
 ENSURE LDLK_GCE_MACHINE_TYPE
 
-INFO "TODO: Creating $LDLK_INSTANCE ($LDLK_GCE_MACHINE_IMAGE, $LDLK_GCE_MACHINE_TYPE)"
-
-INFO "Checking connectivity to $LDLK_INSTANCE"
-$GCLOUD -q compute ssh $UZER@$LDLK_INSTANCE true
+if $GCLOUD compute instances describe $LDLK_INSTANCE; then
+    INFO "Skipping creating $LDLK_INSTANCE"
+    INFO "Checking connectivity to $LDLK_INSTANCE"
+    $GCLOUD -q compute ssh $UZER@$LDLK_INSTANCE true
+else
+    INFO "Creating $LDLK_INSTANCE ($LDLK_GCE_MACHINE_IMAGE, $LDLK_GCE_MACHINE_TYPE)"
+    set -x
+    $GCLOUD compute instances create $LDLK_INSTANCE \
+	    --image $LDLK_GCE_MACHINE_IMAGE \
+	    --machine-type $LDLK_GCE_MACHINE_TYPE
+    set +x
+    INFO "Sleeping 30 seconds"
+    sleep 30
+fi
+INFO "Creating group docker"
+set -x
+$GCLOUD compute ssh $UZER@$LDLK_INSTANCE -- sudo groupadd -f docker
+set +x
+INFO "Adding $UZER to docker"
+set -x
+$GCLOUD compute ssh $UZER@$LDLK_INSTANCE -- sudo usermod -a -G docker $UZER || true
+set +x

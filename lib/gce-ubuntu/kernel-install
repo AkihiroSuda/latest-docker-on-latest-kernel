@@ -6,4 +6,7 @@ source _common
 ENSURE LDLK_WORKDIR
 ENSURE LDLK_INSTANCE
 
-INFO "TODO: Installing Linux to $LDLK_INSTANCE"
+INFO "Installing Linux to $LDLK_INSTANCE"
+set -x
+$GCLOUD compute copy-files $LDLK_WORKDIR/$LDLK_INSTANCE/kernel-output $UZER@$LDLK_INSTANCE:/tmp
+$GCLOUD compute ssh $UZER@$LDLK_INSTANCE -- 'sudo dpkg -i /tmp/kernel-output/*.deb'

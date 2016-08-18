@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+source _common
+
+ENSURE LDLK_WORKDIR
+ENSURE LDLK_INSTANCE
+
+config=$(pwd)/data/kernel_config
+
+(
+    set -e
+    cd $LDLK_WORKDIR/$LDLK_INSTANCE/linux
+    INFO "Using config $config"
+    cp $config .config
+    INFO "Buidling kernel ($(pwd)/../linux.log)"
+    ( yes "" | make oldconfig ) 2>&1 > $(pwd)/../linux.log
+    fakeroot make-kpkg -j $(nproc) --initrd --append-to-version=-ldlk kernel-image kernel-headers 2>&1 >> $(pwd)/../linux.log
+    INFO "Copying kernel to $LDLK_WORKDIR/$LDLK_INSTANCE/kernel-output"
+    mkdir -p $LDLK_WORKDIR/$LDLK_INSTANCE/kernel-output
+    rm -f $LDLK_WORKDIR/$LDLK_INSTANCE/kernel-output/*.deb
+    mv ../*.deb $LDLK_WORKDIR/$LDLK_INSTANCE/kernel-output
+)

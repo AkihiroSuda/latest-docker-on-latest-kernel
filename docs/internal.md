@@ -3,16 +3,18 @@
 Sequence:
 
 ```
-{
+seq {
   init;
   parallel {
     create;
-	kernel-checkout;
-	docker-checkout;
-  }
-  parallel {
-    kernel-build;
-	docker-build;
+	seq {
+	  kernel-checkout;
+	  kernel-build;
+	}
+	seq {
+	  docker-checkout;
+	  docker-build;
+	}
   }
   kernel-install;
   docker-install;

@@ -1,0 +1,2 @@
+kernel_config: Ubuntu 16.04 linux-image-4.4.0-34-generic /boot/config-4.4.0-34-generic 
+
